@@ -54,9 +54,12 @@ Versions a single document as a stable artifact. Sits directly under the doc tit
 
 The authority relationship lives in the intro paragraph, not a separate header field. Keep version and last_updated each on their own line.
 
-- **MAJOR** — invalidates other docs or reverses a decision. Realistically only Charter and PRD. Forces dependent review.
-- **MINOR** — new feature, entity, or section.
-- **PATCH** — wording, clarification, formatting; nothing binding changes.
+- **MAJOR** — changes a safety rule, invalidates dependent docs, reverses a product decision, or weakens/strengthens a binding guarantee. Realistically only Charter and PRD. Forces dependent review.
+- **MINOR** — adds a feature, entity, section, QA item, accepted behavior, or other new binding content.
+- **PATCH** — fixes an inconsistency, stale reference, checklist mismatch, misleading wording, or ambiguity without changing the underlying rule or scope.
+- **NEGLIGIBLE** — formatting/reflow, markdown spacing, punctuation, or typo cleanup that does not affect meaning. No version bump, no local changelog row, and no central changelog entry.
+
+If a formatting change exposes or fixes a misleading safety statement, treat the safety statement correction as PATCH. If the content merely wraps differently, it is NEGLIGIBLE.
 
 A copied feature template starts its _own_ spec at `1.0.0`; the template file's version tracks changes to the form itself.
 
@@ -66,6 +69,6 @@ A copied feature template starts its _own_ spec at `1.0.0`; the template file's 
 
 - [ ] Passed the Feature Template §16 gate + §5c Backfire Check (if a feature)
 - [ ] Citations propagated across all docs that reference the change
-- [ ] Versions + both changelogs (per-doc and central `CHANGELOG.md`) updated
+- [ ] Versions + both changelogs (per-doc and central `CHANGELOG.md`) updated for non-negligible changes
 - [ ] Nothing introduced that AGENT.md §1 forbids; no shaming copy or forbidden vocabulary
 - [ ] Relevant QA safety-track items re-run (if schema/feature changed)

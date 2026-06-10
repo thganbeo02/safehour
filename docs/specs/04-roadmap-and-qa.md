@@ -1,6 +1,6 @@
 # Roadmap & QA
 
-**Version:** 1.0.0  
+**Version:** 1.0.1  
 **Last updated:** 2026-06-10
 
 > Execution layer. Defers upward to `00-safety-charter.md` and delivers the scope in `01-prd.md` against the model in `02-technical-design.md`. Covers build order, milestones, the MVP acceptance standard, and the QA strategy.
@@ -39,7 +39,7 @@ Rationale for putting contact setup (2) before Panic Mode (4): Panic Mode's valu
 
 - Each feature must pass its Feature Template gate (including Charter §16) before it enters a milestone — design-time gate, not a post-build check.
 - The Loss Ledger (highest no-chase risk), Money Protected (most able to become a scoreboard), and Panic Mode (highest safety obligation) each get their own full feature spec before implementation.
-- Future features (RelapseReview, DebtItem, any "money protected" tracker) are out of the MVP roadmap entirely and re-enter only via a fresh Template pass.
+- Future features (RelapseReview, DebtItem, and any additional protection or repayment tracker beyond Money Protected) are out of the MVP roadmap entirely and re-enter only via a fresh Template pass.
 
 ---
 
@@ -108,7 +108,7 @@ The safety track (S-1 through S-13) must pass on every release candidate. A fail
 ## C4. Pre-Launch Checklist
 
 - [ ] Every MVP feature passed its Feature Template gate (incl. Charter §16)
-- [ ] Safety track S-1 through S-12 all green
+- [ ] Safety track S-1 through S-13 all green
 - [ ] MVP acceptance standard (Part B) fully met
 - [ ] Copy reviewed end-to-end against Charter §10, §13
 - [ ] Offline + pre-setup crisis path verified on a real device
@@ -120,4 +120,5 @@ The safety track (S-1 through S-13) must pass on every release candidate. A fail
 
 | Version | Date | Change |
 |---|---|---|
+| 1.0.1 | 2026-06-10 | Clarified that only additional protection/repayment trackers are future scope and included S-13 in the pre-launch checklist. |
 | 1.0.0 | 2026-06-10 | Initial version. |

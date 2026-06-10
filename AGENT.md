@@ -43,6 +43,8 @@ If a task would require violating any of these, **refuse and explain** — do no
 
 Load only the module relevant to the current task. §1 and §2 above are always in context; everything below is task-scoped.
 
+When writing app code, use the exact Expo SDK docs for the installed version before relying on API knowledge. Current app baseline: Expo SDK 54 (`https://docs.expo.dev/versions/v54.0.0/`).
+
 | If you are… | Read |
 |---|---|
 | Editing/creating a spec doc (PRD, TDD, Charter, feature spec) | `docs/agent/doc-workflow.md` |
