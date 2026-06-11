@@ -9,6 +9,31 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ---
 
+## [2026-06-11] — Add onboarding and loading foundation — v0.1.1
+
+Started the M1 Safe Shell by adding the onboarding feature spec, design references, app-level loading screen, and initial source/theme structure.
+
+### Added
+
+- Added `docs/specs/features/onboarding.md` at v1.0.0.
+- Added onboarding/loading design references under `docs/design/`.
+- Added `assets/loading-background.png` as the runtime loading background.
+- Added `src/app/AppRoot.tsx` as the app-level root wrapper.
+- Added `src/screens/LoadingScreen.tsx` for startup UI outside the onboarding flow.
+- Added `src/theme/colors.ts` and `src/theme/typography.ts` for shared design tokens.
+- Added Space Grotesk font loading through `expo-font` and `@expo-google-fonts/space-grotesk`.
+
+### Changed
+
+- Replaced the default Expo starter UI in `App.tsx` with thin root wiring.
+- Updated the loading tagline to "One safe hour at a time." and kept the screen free of cards or transparency overlays.
+- Kept the loading screen outside onboarding because it is app startup UI.
+- Ran `npm audit fix`; remaining moderate audit findings require a breaking Expo SDK upgrade and were deferred.
+
+| Doc | Version |
+|---|---|
+| features/onboarding | 1.0.0 |
+
 ## [2026-06-10] — Add doc map and audit fixes — v0.1.0
 
 Added a working doc map, incorporated the Safety Charter into the audit state, defined doc-change significance levels, and corrected two Roadmap/QA inconsistencies found during the audit.

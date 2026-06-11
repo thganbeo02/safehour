@@ -51,6 +51,10 @@ When writing app code, use the exact Expo SDK docs for the installed version bef
 | Writing, refactoring, or fixing app code | `docs/agent/code-workflow.md` |
 | Wrapping up a session, committing, or updating the changelog | `docs/agent/commit-and-wrapup.md` |
 
+When the user says "wrap up", "commit", "done", or an equivalent close-out request, follow `docs/agent/commit-and-wrapup.md` exactly and in order: inspect, update the changelog if needed, stage deliberately, present the commit plan, then stop before committing. Do not loosely summarize this workflow.
+
+Only update `docs/CHANGELOG.md` during an explicit wrap-up/commit/done-style request, or when the user directly asks to update the changelog. During normal work, keep notes in conversation or local notes instead of preemptively editing the changelog.
+
 The product specs themselves (the "what to build"): `00-safety-charter.md` (constitution), `01-prd.md`, `02-technical-design.md`, `04-roadmap-and-qa.md`, `03-feature-template.md`, and individual feature specs. Refer to specs by filename and section (e.g. "Charter §6", "`02-technical-design.md` §15"); find them by name.
 
 Layout, for orientation:

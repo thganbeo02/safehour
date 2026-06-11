@@ -58,13 +58,15 @@ Versions the project's progress through the build, used on `CHANGELOG.md` sessio
 
 **2. Stage deliberately.** Include the real modifications and new files. Exclude stray artifacts (`.DS_Store`, swap files, unrelated local config). Ask about ambiguous files (`package-lock.json`, `.env.example`). **Never `git add -A` blindly.**
 
-**3. Update the changelog.** Every wrap-up gets at least a session entry (build version bump + short summary). If docs changed, add categorized entries:
+**3. Update the changelog.** Every wrap-up gets at least a session entry (build version bump + short summary). Do this only during an explicit wrap-up/commit/done-style request, or when the owner directly asks to update the changelog; during normal work, keep notes in conversation or local notes instead. If docs changed, add categorized entries:
 - **Added** — new content, sections, features, entities
 - **Changed** — modifications to existing content
 - **Removed** — deletions
 - **Fixed** — concrete errors corrected (not wording)
 
-Entry heading: `## [YYYY-MM-DD] — <summary> — v0.<phase>.<session>`. Past-tense bullets with section/file references. Don't fabricate dates; don't reformat or rewrite existing dated entries — add a new one under today's date even if the work continues an earlier session.
+Entry heading: `## [YYYY-MM-DD] — <summary> — v0.<phase>.<session>`. Use today's actual date. Same date + same wrap-up + same product slice should be consolidated into one entry; do not create one changelog entry per task. Use multiple same-day entries only for genuinely separate completed sessions or unrelated commits.
+
+Do not reformat or rewrite older historical entries unless explicitly asked. If the current work continues an earlier already-closed session, add a new entry under today's date rather than retroactively editing the old one.
 
 **4. Apply the build versioning rules** from §3 (phase from the current roadmap milestone; session bumps within a phase).
 
