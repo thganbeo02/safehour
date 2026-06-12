@@ -1,7 +1,7 @@
 import { ImageBackground, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
-import { fontFamilies, typography } from "../theme/typography";
+import { colors } from "@/theme/colors";
+import { fontFamilies, typography } from "@/theme/typography";
 
 type LoadingScreenProps = {
   fontsLoaded: boolean;
@@ -10,7 +10,7 @@ type LoadingScreenProps = {
 export function LoadingScreen({ fontsLoaded }: LoadingScreenProps) {
   return (
     <ImageBackground
-      source={require("../../assets/loading-background.png")}
+      source={require("@/assets/brand/loading-background.png")}
       style={styles.background}
       resizeMode="cover"
     >
@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
   title: {
     color: colors.navy,
     fontSize: typography.titleSize,
-    letterSpacing: typography.letterSpacing,
+    letterSpacing: typography.headingLetterSpacing,
     textAlign: "center",
   },
   subtitle: {
     color: colors.navy,
     fontSize: typography.subtitleSize,
-    letterSpacing: typography.letterSpacing,
+    letterSpacing: typography.subheadingLetterSpacing,
     textAlign: "center",
   },
   boldFont: {

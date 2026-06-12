@@ -6,7 +6,8 @@ export const fontFamilies = {
 };
 
 export const typography = {
-  letterSpacing: -1,
+  headingLetterSpacing: -1.5,
+  subheadingLetterSpacing: -1,
   titleSize: 64,
   subtitleSize: 24,
 };

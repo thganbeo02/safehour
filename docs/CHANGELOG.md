@@ -9,6 +9,35 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ---
 
+## [2026-06-12] — Complete onboarding flow with local SVG registry — v0.1.2
+
+Implemented the interactive 4-screen onboarding flow, asset re-routing, and centralized SVG registry component (`IconSvgLocal`) for dynamic theme tinting.
+
+### Added
+
+- Added `src/components/icons/IconSvgLocal.tsx` and `src/components/icons/index.ts` central local registry.
+- Added support for 8 raw SVGs: `wind.svg`, `notebook-pen.svg`, `circle-user-round.svg`, `piggy-bank.svg`, `chart-candlestick.svg`, `target.svg`, `undo-2.svg`, `stop.svg`, `phone.svg`, `shield-check.svg`, `bell-ring.svg`, and `chevron.svg`.
+- Added high-fidelity pressable `SetupCard` component inside `OnboardingScreen.tsx` with timing and scale press down transitions (scale to `0.96` and bg color transition to `colors.paleTeal` over 120ms).
+- Added local-only state to onboarding flow to track completion of setup elements.
+- Added gated "Enter SafeHour" logic and a gray warning text ("Complete the required steps to continue.") exactly 12px above the button when requirements are not satisfied.
+
+### Changed
+
+- Moved raw onboarding images (`intro.png`, `loading-background.png`, and `shield-love.png`) to `src/assets/onboarding/`.
+- Configured SVG Metro bundler integration (`metro.config.js` and `react-native-svg-transformer`).
+- Migrated relative imports across screens to TypeScript path alias `@/*`.
+- Refactored `BoundariesPage` (Step 2) to display the new SVG boundaries with dynamic native tint-matching.
+- Configured setup cards to hide the `REQUIRED` badge/tag instantly once marked as completed.
+
+### Removed
+
+- Removed all instances of typography `lineHeight` to meet viewport boundary requirements.
+
+### Notes
+
+- Identified a future Safety Track conflict (gated crisis access) on the onboarding flow: Charter §9 requires a direct route to emergency support that must not be gated behind onboarding or setup. Added to the design backlog.
+- Implemented gated setup requirements on step 3 as an intentional testing mechanism for verifying interactive states; production will permit bypassing per FR-ONB-003.
+
 ## [2026-06-11] — Add onboarding and loading foundation — v0.1.1
 
 Started the M1 Safe Shell by adding the onboarding feature spec, design references, app-level loading screen, and initial source/theme structure.
