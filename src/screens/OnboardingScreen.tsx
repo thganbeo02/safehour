@@ -14,13 +14,14 @@ import {
 
 import { IconSvgLocal } from "@/components/icons/IconSvgLocal";
 import type { IconSvgName } from "@/components/icons";
+import ShieldLoveLogo from "@/assets/onboarding/shield-love.svg";
 import { colors } from "@/theme/colors";
 import { fontFamilies, typography } from "@/theme/typography";
 
 const { width } = Dimensions.get("window");
 
 type OnboardingScreenProps = {
-  onEnter: () => void;
+  onEnter: () => void | Promise<void>;
 };
 
 type HelpItem = {
@@ -165,10 +166,16 @@ export function OnboardingScreen({ onEnter }: OnboardingScreenProps) {
           onToggleSetup={toggleSetupCompleted}
         />
       </ScrollView>
+      {page === 3 && !requiredCompleted ? (
+        <View style={styles.warningWrap} pointerEvents="none">
+          <Text style={styles.warningText}>
+            Complete the required steps to continue.
+          </Text>
+        </View>
+      ) : null}
       <FixedStepButton
         label={page === 3 ? "Enter SafeHour" : "Next"}
         disabled={page === 3 && !requiredCompleted}
-        showWarning={page === 3 && !requiredCompleted}
         onPress={page === 3 ? onEnter : () => goToPage(page + 1)}
       />
     </Animated.View>
@@ -267,7 +274,7 @@ function HelpPage() {
           </View>
         ))}
       </View>
-      <Text style={styles.quote}>
+      <Text style={styles.helpQuote}>
         "Protection, not performance, is the priority."
       </Text>
     </ContentPage>
@@ -375,10 +382,6 @@ function SetupPage({
   completedSetups: Record<string, boolean>;
   onToggleSetup: (title: string) => void;
 }) {
-  const completedCount = setupItems.filter(
-    (item) => completedSetups[item.title],
-  ).length;
-
   return (
     <ContentPage>
       <Text style={styles.heading}>Complete your setup</Text>
@@ -396,19 +399,7 @@ function SetupPage({
         ))}
       </View>
       <View style={styles.statusRow}>
-        <Image
-          source={require("@/assets/onboarding/shield-love.png")}
-          style={styles.statusShieldImage}
-          resizeMode="contain"
-        />
-        <View style={styles.statusCopy}>
-          <Text style={styles.itemTitle}>
-            Support setup Status ({completedCount}/3 ready)
-          </Text>
-          <Text style={styles.itemBody}>
-            Pause before acting. Reach out to someone. Protect your money.
-          </Text>
-        </View>
+        <ShieldLoveLogo width={240} height={180} />
       </View>
     </ContentPage>
   );
@@ -421,21 +412,14 @@ function ContentPage({ children }: { children: React.ReactNode }) {
 function FixedStepButton({
   label,
   disabled,
-  showWarning,
   onPress,
 }: {
   label: string;
   disabled?: boolean;
-  showWarning?: boolean;
   onPress: () => void;
 }) {
   return (
     <View style={styles.fixedButtonWrap}>
-      {showWarning && (
-        <Text style={styles.warningText}>
-          Complete the required steps to continue.
-        </Text>
-      )}
       <Pressable
         style={[styles.primaryButton, disabled && styles.primaryButtonDisabled]}
         onPress={disabled ? undefined : onPress}
@@ -456,7 +440,7 @@ const styles = StyleSheet.create({
     width,
     flex: 1,
     backgroundColor: colors.offWhite,
-    paddingHorizontal: 32,
+    paddingHorizontal: 28,
     paddingTop: 54,
   },
   introPage: {
@@ -465,13 +449,13 @@ const styles = StyleSheet.create({
     paddingBottom: 72,
   },
   contentPage: {
-    paddingTop: 110,
+    paddingTop: 100,
     paddingBottom: 150,
   },
   header: {
     position: "absolute",
-    left: 32,
-    right: 32,
+    left: 28,
+    right: 28,
     top: 54,
     zIndex: 1,
     flexDirection: "row",
@@ -486,7 +470,7 @@ const styles = StyleSheet.create({
   introTitle: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 24,
+    fontSize: 26,
     letterSpacing: typography.headingLetterSpacing,
     maxWidth: 310,
     textAlign: "center",
@@ -494,7 +478,7 @@ const styles = StyleSheet.create({
   introBody: {
     color: colors.gray,
     fontFamily: fontFamilies.medium,
-    fontSize: 16,
+    fontSize: 18,
     letterSpacing: typography.subheadingLetterSpacing,
     maxWidth: 310,
     marginTop: 16,
@@ -510,7 +494,7 @@ const styles = StyleSheet.create({
   introButtonText: {
     color: colors.white,
     fontFamily: fontFamilies.bold,
-    fontSize: 18,
+    fontSize: 20,
   },
   progressPills: {
     flexDirection: "row",
@@ -528,24 +512,37 @@ const styles = StyleSheet.create({
   stepText: {
     color: colors.teal,
     fontFamily: fontFamilies.bold,
-    fontSize: 14,
+    fontSize: 16,
   },
   heading: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 24,
+    fontSize: 26,
     letterSpacing: typography.headingLetterSpacing,
   },
   subheading: {
     color: colors.gray,
-    fontFamily: fontFamilies.medium,
-    fontSize: 16,
+    fontFamily: fontFamilies.regular,
+    fontSize: 18,
+    letterSpacing: typography.subheadingLetterSpacing,
+    marginTop: 8,
+  },
+  helpHeading: {
+    color: colors.navy,
+    fontFamily: fontFamilies.regular,
+    fontSize: 26,
+    letterSpacing: typography.headingLetterSpacing,
+  },
+  helpSubheading: {
+    color: colors.gray,
+    fontFamily: fontFamilies.regular,
+    fontSize: 18,
     letterSpacing: typography.subheadingLetterSpacing,
     marginTop: 8,
   },
   helpList: {
-    gap: 36,
-    marginTop: 38,
+    gap: 32,
+    marginTop: 32,
   },
   helpRow: {
     flexDirection: "row",
@@ -571,26 +568,41 @@ const styles = StyleSheet.create({
   iconText: {
     color: colors.teal,
     fontFamily: fontFamilies.bold,
-    fontSize: 28,
+    fontSize: 30,
   },
   helpCopy: {
     flex: 1,
   },
+  helpItemTitle: {
+    color: colors.navy,
+    fontFamily: fontFamilies.regular,
+    fontSize: 18,
+    letterSpacing: -1,
+  },
+  helpItemBody: {
+    color: colors.gray,
+    fontFamily: fontFamilies.regular,
+    fontSize: 14,
+    marginTop: 4,
+    letterSpacing: -0.5,
+  },
   itemTitle: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 16,
+    fontSize: 18,
+    letterSpacing: -1,
   },
   itemBody: {
     color: colors.gray,
-    fontFamily: fontFamilies.medium,
-    fontSize: 12,
+    fontFamily: fontFamilies.regular,
+    fontSize: 14,
     marginTop: 4,
+    letterSpacing: -0.5,
   },
-  quote: {
+  helpQuote: {
     color: colors.teal,
-    fontFamily: fontFamilies.bold,
-    fontSize: 12,
+    fontFamily: fontFamilies.regular,
+    fontSize: 14,
     marginTop: 45,
     textAlign: "center",
   },
@@ -599,7 +611,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 16,
     justifyContent: "center",
-    marginTop: 36,
+    marginTop: 32,
   },
   boundaryCard: {
     width: 151,
@@ -617,7 +629,7 @@ const styles = StyleSheet.create({
   boundaryLabel: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 15,
+    fontSize: 18,
     marginTop: 14,
     textAlign: "center",
   },
@@ -625,20 +637,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.navy,
     borderRadius: 8,
-    marginHorizontal: 20,
+    marginHorizontal: 12,
     marginTop: 36,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   quoteBoxText: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 12,
+    fontSize: 14,
     textAlign: "center",
   },
   setupList: {
-    gap: 28,
-    marginTop: 36,
+    gap: 20,
+    marginTop: 32,
   },
   setupCard: {
     minHeight: 91,
@@ -647,8 +659,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
-    gap: 13,
-    paddingHorizontal: 18,
+    gap: 12,
+    paddingHorizontal: 12,
     backgroundColor: colors.offWhite,
     shadowColor: colors.teal,
     shadowOffset: { width: 0, height: 8 },
@@ -667,24 +679,25 @@ const styles = StyleSheet.create({
   required: {
     color: colors.navy,
     fontFamily: fontFamilies.bold,
-    fontSize: 8,
+    fontSize: 10,
     backgroundColor: "#EDF6FA",
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   statusRow: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: 18,
-    marginTop: 40,
+    justifyContent: "center",
+    marginTop: 8,
   },
-  statusShieldImage: {
-    width: 96,
-    height: 76,
-  },
-  statusCopy: {
-    flex: 1,
+  warningWrap: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 134,
+    alignItems: "center",
+    paddingHorizontal: 28,
+    zIndex: 1,
   },
   fixedButtonWrap: {
     position: "absolute",
@@ -697,10 +710,10 @@ const styles = StyleSheet.create({
   },
   warningText: {
     color: colors.gray,
-    fontFamily: fontFamilies.medium,
-    fontSize: 12,
+    fontFamily: fontFamilies.regular,
+    fontSize: 14,
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 4,
   },
   primaryButton: {
     borderRadius: 18,
@@ -718,6 +731,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: colors.white,
     fontFamily: fontFamilies.bold,
-    fontSize: 18,
+    fontSize: 20,
   },
 });

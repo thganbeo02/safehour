@@ -9,6 +9,28 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ---
 
+## [2026-06-16] — Add local persistence skeleton — v0.1.3
+
+Completed the remaining M1 storage gap by adding a local-first SQLite skeleton and wiring onboarding completion to durable local state.
+
+### Added
+
+- Added `expo-sqlite` as the local-first storage dependency.
+- Added `src/storage/db.ts` with initialization for M1/MVP core tables: `users`, `accountability_contacts`, `urges`, `check_ins`, `loss_ledger_entries`, `safety_plans`, `safety_commitments`, and `protection_entries`.
+- Added `metadata` storage for app-level flags, including `onboardingCompleted`.
+- Added dev-only storage debug logging for `metadata` and `users`.
+- Added a dev-only onboarding reset button on the home placeholder.
+
+### Changed
+
+- App startup now initializes local storage before deciding whether to show onboarding.
+- Completing onboarding now persists the completion flag and creates the default local user record with preferred currency and recovery start date.
+- Updated the typography mapping so Binance Plex backs regular/light body text while onboarding steps share the same heading and item text styles.
+
+### Notes
+
+- The schema keeps Loss Ledger and Money Protected structurally separate and contains no fields for gains, market data, targets, or netting, supporting Charter §4 and QA S-13.
+
 ## [2026-06-12] — Complete onboarding flow with local SVG registry — v0.1.2
 
 Implemented the interactive 4-screen onboarding flow, asset re-routing, and centralized SVG registry component (`IconSvgLocal`) for dynamic theme tinting.

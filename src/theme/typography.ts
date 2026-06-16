@@ -1,6 +1,6 @@
 export const fontFamilies = {
-  light: "SpaceGrotesk_300Light",
-  regular: "SpaceGrotesk_400Regular",
+  light: "BinancePlex",
+  regular: "BinancePlex",
   medium: "SpaceGrotesk_500Medium",
   bold: "SpaceGrotesk_700Bold",
 };
