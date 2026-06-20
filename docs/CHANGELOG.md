@@ -26,6 +26,8 @@ Completed the remaining M1 storage gap by adding a local-first SQLite skeleton a
 - App startup now initializes local storage before deciding whether to show onboarding.
 - Completing onboarding now persists the completion flag and creates the default local user record with preferred currency and recovery start date.
 - Updated the typography mapping so Binance Plex backs regular/light body text while onboarding steps share the same heading and item text styles.
+- Changed onboarding setup cards into required-to-acknowledge previews while documenting that trusted contact, daily check-in/reminder behavior, and safety commitments are implemented in later milestones.
+- Split developer tools into a lightweight onboarding reset and a separate local data wipe.
 
 ### Notes
 

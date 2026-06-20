@@ -76,13 +76,13 @@ const setupItems: SetupItem[] = [
   {
     iconName: "IC_PHONE",
     title: "Trusted contact",
-    body: "Someone you can contact before acting on an urge.",
+    body: "Set up someone you can contact before acting on an urge.",
     required: true,
   },
   {
     iconName: "IC_SHIELD_CHECK",
     title: "Safety commitments",
-    body: "Simple rules that create distance from risky decisions.",
+    body: "Create simple rules that add distance from risky decisions.",
     required: true,
   },
   {
@@ -169,7 +169,7 @@ export function OnboardingScreen({ onEnter }: OnboardingScreenProps) {
       {page === 3 && !requiredCompleted ? (
         <View style={styles.warningWrap} pointerEvents="none">
           <Text style={styles.warningText}>
-            Complete the required steps to continue.
+            Tick the required previews to continue.
           </Text>
         </View>
       ) : null}
@@ -384,9 +384,9 @@ function SetupPage({
 }) {
   return (
     <ContentPage>
-      <Text style={styles.heading}>Complete your setup</Text>
+      <Text style={styles.heading}>Your next setup</Text>
       <Text style={styles.subheading}>
-        Setting up your support plan only takes a couple more minutes.
+        These protective steps come next as SafeHour grows.
       </Text>
       <View style={styles.setupList}>
         {setupItems.map((item) => (

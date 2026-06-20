@@ -16,6 +16,7 @@ import {
   initializeLocalDatabase,
   isOnboardingCompleted,
   resetOnboardingForDevelopment,
+  wipeLocalDataForDevelopment,
 } from "@/storage/db";
 import { colors } from "@/theme/colors";
 
@@ -69,6 +70,13 @@ export function AppRoot() {
 
   async function handleDevelopmentReset() {
     await resetOnboardingForDevelopment();
+    await debugReadStorage();
+    setShowOnboarding(true);
+  }
+
+  async function handleDevelopmentWipe() {
+    await wipeLocalDataForDevelopment();
+    await debugReadStorage();
     setShowOnboarding(true);
   }
 
@@ -81,7 +89,10 @@ export function AppRoot() {
       {showOnboarding ? (
         <OnboardingScreen onEnter={handleOnboardingComplete} />
       ) : (
-        <HomePlaceholderScreen onResetOnboarding={handleDevelopmentReset} />
+        <HomePlaceholderScreen
+          onResetOnboarding={handleDevelopmentReset}
+          onWipeLocalData={handleDevelopmentWipe}
+        />
       )}
       <StatusBar style="dark" />
     </View>

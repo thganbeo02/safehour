@@ -5,19 +5,30 @@ import { fontFamilies, typography } from "@/theme/typography";
 
 type HomePlaceholderScreenProps = {
   onResetOnboarding?: () => void;
+  onWipeLocalData?: () => void;
 };
 
 export function HomePlaceholderScreen({
   onResetOnboarding,
+  onWipeLocalData,
 }: HomePlaceholderScreenProps) {
   return (
     <View style={styles.root}>
       <Text style={styles.title}>SafeHour</Text>
       <Text style={styles.body}>Home screen placeholder.</Text>
-      {__DEV__ && onResetOnboarding ? (
-        <Pressable style={styles.resetButton} onPress={onResetOnboarding}>
-          <Text style={styles.resetButtonText}>Reset onboarding</Text>
-        </Pressable>
+      {__DEV__ ? (
+        <View style={styles.devActions}>
+          {onResetOnboarding ? (
+            <Pressable style={styles.resetButton} onPress={onResetOnboarding}>
+              <Text style={styles.resetButtonText}>Reset onboarding</Text>
+            </Pressable>
+          ) : null}
+          {onWipeLocalData ? (
+            <Pressable style={styles.resetButton} onPress={onWipeLocalData}>
+              <Text style={styles.resetButtonText}>Wipe local data</Text>
+            </Pressable>
+          ) : null}
+        </View>
       ) : null}
     </View>
   );
@@ -44,11 +55,14 @@ const styles = StyleSheet.create({
     letterSpacing: typography.subheadingLetterSpacing,
     marginTop: 12,
   },
+  devActions: {
+    gap: 12,
+    marginTop: 28,
+  },
   resetButton: {
     borderColor: colors.navy,
     borderRadius: 14,
     borderWidth: 1,
-    marginTop: 28,
     paddingHorizontal: 18,
     paddingVertical: 12,
   },

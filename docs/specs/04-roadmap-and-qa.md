@@ -38,6 +38,7 @@ Rationale for putting contact setup (2) before Panic Mode (4): Panic Mode's valu
 ## A3. Sequencing Notes
 
 - Each feature must pass its Feature Template gate (including Charter §16) before it enters a milestone — design-time gate, not a post-build check.
+- The onboarding setup cards in M1 are non-blocking previews only. Actual persistence-backed setup is implemented in later milestones: trusted contact in M2, daily check-in/reminder behavior in M3, and safety plan/commitments in M4.
 - The Loss Ledger (highest no-chase risk), Money Protected (most able to become a scoreboard), and Panic Mode (highest safety obligation) each get their own full feature spec before implementation.
 - Future features (RelapseReview, DebtItem, and any additional protection or repayment tracker beyond Money Protected) are out of the MVP roadmap entirely and re-enter only via a fresh Template pass.
 

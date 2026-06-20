@@ -167,6 +167,28 @@ export async function resetOnboardingForDevelopment() {
   await setMetadataValue(ONBOARDING_COMPLETED_KEY, "false");
 }
 
+export async function wipeLocalDataForDevelopment() {
+  if (!__DEV__) {
+    return;
+  }
+
+  const db = await getDatabase();
+
+  await db.execAsync(`
+    PRAGMA foreign_keys = OFF;
+    DELETE FROM protection_entries;
+    DELETE FROM safety_commitments;
+    DELETE FROM safety_plans;
+    DELETE FROM loss_ledger_entries;
+    DELETE FROM check_ins;
+    DELETE FROM urges;
+    DELETE FROM accountability_contacts;
+    DELETE FROM users;
+    DELETE FROM metadata;
+    PRAGMA foreign_keys = ON;
+  `);
+}
+
 export async function debugReadStorage() {
   if (!__DEV__) {
     return;

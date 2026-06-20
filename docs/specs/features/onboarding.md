@@ -78,6 +78,7 @@ First app launch; Settings if the user wants to review the product boundaries ag
 - System shows product boundaries: SafeHour is for pause, support, and honest recovery actions; it is not for market analysis or financial speculation.
 - System shows the most important first actions: use Panic Mode, contact support, complete a daily check-in, and build barriers.
 - User continues to the home screen.
+- System may ask the user to acknowledge required setup previews before continuing, but onboarding completion does not create trusted-contact, daily-check-in, safety-plan, or safety-commitment records.
 - System keeps Panic Mode and crisis/support guidance reachable without requiring setup.
 
 ## 9. Alternative Flows
@@ -128,7 +129,7 @@ First app launch; Settings if the user wants to review the product boundaries ag
 | Entity | Description |
 |---|---|
 | User | May later store whether onboarding is complete; no sensitive recovery data is required for onboarding |
-| AccountabilityContact | Mentioned as a later setup path; not required to complete onboarding |
+| AccountabilityContact | Mentioned as a later setup path; not required to complete onboarding and not created by onboarding |
 
 Explicitly not related to: Urge, CheckIn, LossLedgerEntry, ProtectionEntry, SafetyPlan, SafetyCommitment. Onboarding does not create recovery records.
 
@@ -138,7 +139,7 @@ Explicitly not related to: Urge, CheckIn, LossLedgerEntry, ProtectionEntry, Safe
 |---|---|---|---|
 | FR-ONB-001 | System shows a first-run welcome explaining SafeHour's purpose | Must-have | Calm, short, non-shaming |
 | FR-ONB-002 | System states product boundaries before home access | Must-have | No market analysis, financial speculation, or risky-action support |
-| FR-ONB-003 | User can continue to the home screen without entering sensitive data | Must-have | No forced account/contact/loss setup |
+| FR-ONB-003 | User can continue to the home screen without entering sensitive data | Must-have | Required setup previews may be acknowledged, but no account/contact/loss data is entered |
 | FR-ONB-004 | System offers a direct route to Panic Mode/support guidance from onboarding | Must-have | Required for first-launch safety |
 | FR-ONB-005 | System introduces trusted-contact setup as a safe next step | Should-have | Optional, not blocking |
 | FR-ONB-006 | User can review onboarding/boundary copy later from Settings | Nice-to-have | Useful for trust and clarity |
@@ -158,7 +159,7 @@ Explicitly not related to: Urge, CheckIn, LossLedgerEntry, ProtectionEntry, Safe
 - Required onboarding screens must have a clear continue action.
 - Panic Mode/support route must be available from onboarding without setup.
 - No onboarding field may collect loss amount, money protected amount, exchange/platform detail, market symbol, leverage, strategy, or financial target.
-- Onboarding completion must not depend on creating an account or trusted contact.
+- Onboarding completion must not depend on creating an account, trusted contact, recovery record, or financial record.
 - Shipped onboarding copy must pass review against Charter §10 and AGENT.md §1 forbidden vocabulary.
 
 ## 15. Acceptance Criteria
