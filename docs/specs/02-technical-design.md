@@ -1,7 +1,7 @@
 # Technical Design Doc (TDD)
 
-**Version:** 1.0.0  
-**Last updated:** 2026-06-10
+**Version:** 1.1.0  
+**Last updated:** 2026-06-22
 
 > Defers upward to `00-safety-charter.md` and implements the requirements in `01-prd.md`. Where anything here conflicts with the Charter, the Charter wins. This doc covers architecture, the data model, and the schema-level enforcement of the safety rules.
 
@@ -200,15 +200,17 @@ Relationships: belongs to User; may belong to SafetyPlan.
 
 # 11. Entity: ProtectionEntry
 
-Represents money the user has kept **out of the loop** — set aside from real income, or repaid toward a debt. This is a protective record, not a recovery ledger. It is the structural counterpart to the LossLedgerEntry: where that records damage acknowledged, this records protection achieved. **The two must never be combined, netted, or computed against each other.**
+Represents money the user has kept **out of the loop** — set aside from real income, repaid toward a debt, or later withdrawn from protection as an honest append-only event. This is a protective record, not a recovery ledger. It is the structural counterpart to the LossLedgerEntry: where that records damage acknowledged, this records protection achieved. **The two must never be combined, netted, or computed against each other.**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | UUID | Yes | Unique entry ID |
 | userId | UUID | Yes | Owner |
-| amountProtected | number | Yes | Positive number; money saved or repaid from real income |
+| amountProtected | number | Yes | Signed amount. Positive for `saved` and `debt_repaid`; negative for `withdrawal`. |
 | currency | string | Yes | Example: VND |
-| kind | enum | Yes | `saved`, `debt_repaid` |
+| kind | enum | Yes | `saved`, `debt_repaid`, `withdrawal` |
+| destination | string | Yes | Kind-dependent user-extensible label. For `saved`/`withdrawal`, where money is kept or drawn from; for `debt_repaid`, who/what was repaid. Defaults depend on kind. |
+| reachability | enum | No | Applies when `kind = saved` or `kind = withdrawal`: `self_held` or `held_by_other`; determines whether the trusted-person friction gate applies |
 | linkedDebtItemId | UUID | No | Future link to a DebtItem when that entity ships; null in MVP |
 | context | text | No | Plain description (e.g. "set aside from salary") |
 | createdAt | datetime | Yes | Timestamp |
@@ -216,14 +218,19 @@ Represents money the user has kept **out of the loop** — set aside from real i
 
 **Structural constraints (the absence is the safety feature):**
 
-- There is no field for a trading or gambling gain, and `amountProtected` may only originate from legitimate income. The schema offers nowhere to record a market return.
+- There is no field for a trading or gambling gain, and positive `amountProtected` values may only originate from legitimate income. The schema offers nowhere to record a market return.
 - There is no `target`, `goal`, `remaining`, or `recoverBy` field. The entity cannot express a number the user must reach.
 - There is no field, and no permitted computation, that nets `amountProtected` against any `LossLedgerEntry.amountLost`. No net figure exists anywhere in the model. Any "protected minus lost" calculation is forbidden at the application layer and has no schema to support it.
-- The displayed aggregate is a single cumulative "money protected so far" sum. It is never shown beside a loss total, and never as progress toward a goal.
+- The displayed aggregate is a single cumulative "money protected so far" sum, derived at read time by summing `amountProtected` across ProtectionEntry records. It is never stored as a mutable running total, never shown beside a loss total, and never shown as progress toward a goal.
+- `destination` is interpreted by `kind`. For `kind = saved`, it means where protected money is currently kept, such as `bank`, `cash`, or a user-created label like `Mom`. For `kind = debt_repaid`, it means the lender, person, or institution repaid, such as `bank`, `credit_card`, or `Mom`. For `kind = withdrawal`, it means where protected money was drawn from. The same label may appear under multiple kinds with different meaning: `bank` can mean money saved in a bank account, a loan payment made to a bank, or money withdrawn from a bank-held protected amount.
+- `destination` is a pure label. It stores no balance, account identifier, link, institution connection, fetch URL, exchange connection, or external reference. A user-created label that names an unsafe place still does not create any affordance to connect, fetch, trade, or inspect a balance.
+- `reachability` is load-bearing for `kind = saved` and `kind = withdrawal`. If saved money is marked or withdrawn as `held_by_other`, the app must treat any reduction, reversal, or reclaim attempt as a high-risk money-movement flow, not as a normal edit. `reachability` does not apply to `debt_repaid` entries because repaid debt is not held money and has no reclaim path.
+- Saved money held by a trusted person may count toward the cumulative protected total because it can be one of the strongest practical barriers against relapse. This remains safe only if the friction gate is non-optional: the model must never include a frictionless reclaim, withdraw, transfer-back, or "make available" affordance.
+- Past `ProtectionEntry` records are append-only after creation. Withdrawals are recorded as separate `kind = withdrawal` entries with negative `amountProtected`; past protected entries are never mutated or deleted. For withdrawal entries with `reachability = held_by_other`, the event routes through the high-risk response and trusted-person contact path before it can be recorded.
 
 Framing constraint (copy): use "protected" / "kept out of the loop" / "set aside" / "repaid." Never "recovered," "back," "regained," "earned back," "made back," or "net." (Charter §4, §10.)
 
-Relationships: belongs to User; may link to a future DebtItem (§13) when `kind` is `debt_repaid`.
+Relationships: belongs to User; may link to a future DebtItem (§13) when `kind` is `debt_repaid`; may correspond to a SafetyCommitment (§10) when saved money is held by a trusted person.
 
 ---
 
@@ -296,11 +303,13 @@ This is a load-bearing structural rule, not a style preference.
 The data model is acceptable if it:
 
 - supports recovery behavior, accountability, urge interruption, and loss acknowledgement
-- supports a protective record of money saved or repaid, from real income only
+- supports a protective record of money saved or repaid, from real income only, and append-only withdrawal events from protection
 - does not support trading behavior, market analysis, or PnL calculation
 - does not create recovery targets
 - has no field anywhere capable of storing a trading gain or a recover-to target
 - has no field or computation that nets protection against loss
+- treats held-by-other saved money and withdrawals from held-by-other protection as protected only with a mandatory high-risk friction gate
+- stores destinations as kind-dependent labels only, with no balance, link-out, external account, or frictionless reclaim affordance
 - guarantees a relapse can never erase streak history (`longestStreakDays` is preserved)
 
 ---
@@ -309,4 +318,5 @@ The data model is acceptable if it:
 
 | Version | Date | Change |
 |---|---|---|
+| 1.1.0 | 2026-06-22 | Added kind-dependent ProtectionEntry destination/reachability fields, withdrawal kind with signed amounts, append-only reduction handling, and trusted-person held-money constraints. |
 | 1.0.0 | 2026-06-10 | Initial version. |

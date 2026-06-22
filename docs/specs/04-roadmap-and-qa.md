@@ -1,7 +1,7 @@
 # Roadmap & QA
 
-**Version:** 1.0.1  
-**Last updated:** 2026-06-10
+**Version:** 1.1.0  
+**Last updated:** 2026-06-22
 
 > Execution layer. Defers upward to `00-safety-charter.md` and delivers the scope in `01-prd.md` against the model in `02-technical-design.md`. Covers build order, milestones, the MVP acceptance standard, and the QA strategy.
 
@@ -56,7 +56,7 @@ The MVP is acceptable when:
 - User can log an urge
 - User can complete daily check-in
 - User can record loss without recovery target
-- User can record money protected (saved or repaid) with no target and no netting against losses
+- User can record money protected (saved, repaid, held by a trusted person, or withdrawn from protection) with no target, no netting against losses, no frictionless reclaim for held-by-other saved money, signed withdrawal entries, and append-only history for reductions
 - User can create safety commitments
 - App contains no trading-specific fields
 - App contains no market data
@@ -84,6 +84,7 @@ Structural (assert the *absence* is enforced, not just the UI):
 - **S-3** Derived streak survives a relapse: `longestStreakDays` is updated before `recoveryStartDate` advances; no history is deleted. (TDD §4; Charter §14.)
 - **S-4** No cloud, analytics, or third-party tracker calls exist in the MVP build. Verify at the network layer. (Charter §12.)
 - **S-13** No net, ratio, or recovery-percentage value combining ProtectionEntry and LossLedgerEntry exists in the model or UI; the two are never displayed adjacent or paired. ProtectionEntry has no target/goal/remaining field and cannot store a trading gain. Verify by schema inspection and screen review. (Charter §4; TDD §11, §15.)
+- **S-14** ProtectionEntry destinations are kind-dependent labels only: for `saved`, destination is where money is kept and may have reachability; for `debt_repaid`, destination is who/what was repaid and reachability does not apply; for `withdrawal`, destination is where protected money was drawn from and reachability applies. No balance, account identifier, URL, external connection, balance-fetch, or link-out exists. `saved` and `debt_repaid` entries must have positive `amountProtected`; `withdrawal` entries must have negative `amountProtected`; the protected total is derived from entries, not stored. Any entry with `reachability = held_by_other` has no frictionless reclaim/withdraw/release affordance; withdrawal/reclaim attempts route through the high-risk flow and are recorded append-only rather than mutating past entries. Verify by schema inspection and screen review. This is distinct from S-13, which governs loss/protection netting. (TDD §11; PRD §C3.7.)
 
 Behavioral / copy:
 
@@ -104,12 +105,12 @@ Design:
 
 ## C3. Regression Gate
 
-The safety track (S-1 through S-13) must pass on every release candidate. A failure in S-1 through S-4 or S-13 is a hard block — these are structural guarantees the whole product depends on. A new feature is not "done" until it has been run back through the Charter §16 test post-implementation, not just at design time (the Loss Ledger and Money Protected in particular, per PRD §C3.5 and §C3.7).
+The safety track (S-1 through S-14) must pass on every release candidate. A failure in S-1 through S-4, S-13, or S-14 is a hard block — these are structural guarantees the whole product depends on. A new feature is not "done" until it has been run back through the Charter §16 test post-implementation, not just at design time (the Loss Ledger and Money Protected in particular, per PRD §C3.5 and §C3.7).
 
 ## C4. Pre-Launch Checklist
 
 - [ ] Every MVP feature passed its Feature Template gate (incl. Charter §16)
-- [ ] Safety track S-1 through S-13 all green
+- [ ] Safety track S-1 through S-14 all green
 - [ ] MVP acceptance standard (Part B) fully met
 - [ ] Copy reviewed end-to-end against Charter §10, §13
 - [ ] Offline + pre-setup crisis path verified on a real device
@@ -121,5 +122,6 @@ The safety track (S-1 through S-13) must pass on every release candidate. A fail
 
 | Version | Date | Change |
 |---|---|---|
+| 1.1.0 | 2026-06-22 | Added S-14 for kind-dependent Money Protected destinations, scoped reachability, signed withdrawal entries, append-only reductions, and trusted-person held-money friction gate. |
 | 1.0.1 | 2026-06-10 | Clarified that only additional protection/repayment trackers are future scope and included S-13 in the pre-launch checklist. |
 | 1.0.0 | 2026-06-10 | Initial version. |

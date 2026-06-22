@@ -17,6 +17,19 @@ type UserIdRow = {
 export async function initializeLocalDatabase() {
   const db = await getDatabase();
 
+  // Migration for protection_entries to v1.1.0 (check if destination column exists)
+  try {
+    const tableInfo = await db.getAllAsync<{ name: string }>(
+      "PRAGMA table_info(protection_entries);"
+    );
+    const hasDestination = tableInfo.some((col) => col.name === "destination");
+    if (tableInfo.length > 0 && !hasDestination) {
+      await db.execAsync("DROP TABLE IF EXISTS protection_entries;");
+    }
+  } catch (error) {
+    console.error("Migration check failed", error);
+  }
+
   await db.execAsync(`
     PRAGMA foreign_keys = ON;
 
@@ -132,9 +145,11 @@ export async function initializeLocalDatabase() {
     CREATE TABLE IF NOT EXISTS protection_entries (
       id TEXT PRIMARY KEY NOT NULL,
       user_id TEXT NOT NULL,
-      amount_protected REAL NOT NULL CHECK (amount_protected > 0),
+      amount_protected REAL NOT NULL,
       currency TEXT NOT NULL,
-      kind TEXT NOT NULL CHECK (kind IN ('saved', 'debt_repaid')),
+      kind TEXT NOT NULL CHECK (kind IN ('saved', 'debt_repaid', 'withdrawal')),
+      destination TEXT NOT NULL,
+      reachability TEXT CHECK (reachability IN ('self_held', 'held_by_other')),
       linked_debt_item_id TEXT,
       context TEXT,
       created_at TEXT NOT NULL,
@@ -267,4 +282,87 @@ function createUuid() {
     const value = char === "x" ? random : (random & 0x3) | 0x8;
     return value.toString(16);
   });
+}
+
+export type ProtectionEntry = {
+  id: string;
+  user_id: string;
+  amount_protected: number;
+  currency: string;
+  kind: "saved" | "debt_repaid" | "withdrawal";
+  destination: string;
+  reachability: "self_held" | "held_by_other" | null;
+  linked_debt_item_id: string | null;
+  context: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function saveProtectionEntry(entry: {
+  amount: number;
+  currency: string;
+  kind: "saved" | "debt_repaid" | "withdrawal";
+  destination: string;
+  reachability?: "self_held" | "held_by_other" | null;
+  context?: string;
+}) {
+  if (entry.kind === "saved" || entry.kind === "debt_repaid") {
+    if (entry.amount <= 0) {
+      throw new Error("Amount must be positive for saved or debt_repaid entries");
+    }
+  } else if (entry.kind === "withdrawal") {
+    if (entry.amount >= 0) {
+      throw new Error("Amount must be negative for withdrawal entries");
+    }
+  }
+
+  const db = await getDatabase();
+  const userId = await ensureDefaultUser();
+  const now = new Date().toISOString();
+  const id = createUuid();
+
+  await db.runAsync(
+    `INSERT INTO protection_entries (
+      id,
+      user_id,
+      amount_protected,
+      currency,
+      kind,
+      destination,
+      reachability,
+      linked_debt_item_id,
+      context,
+      created_at,
+      updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?)`,
+    id,
+    userId,
+    entry.amount,
+    entry.currency,
+    entry.kind,
+    entry.destination,
+    entry.kind === "debt_repaid" ? null : (entry.reachability ?? null),
+    entry.context ?? null,
+    now,
+    now,
+  );
+}
+
+export async function getProtectionEntries(): Promise<ProtectionEntry[]> {
+  const db = await getDatabase();
+  const userId = await ensureDefaultUser();
+  return db.getAllAsync<ProtectionEntry>(
+    "SELECT * FROM protection_entries WHERE user_id = ? ORDER BY created_at DESC",
+    userId,
+  );
+}
+
+export async function getMoneyProtectedSum(): Promise<number> {
+  const db = await getDatabase();
+  const userId = await ensureDefaultUser();
+  const row = await db.getFirstAsync<{ total: number }>(
+    "SELECT COALESCE(SUM(amount_protected), 0) as total FROM protection_entries WHERE user_id = ?",
+    userId,
+  );
+  return row?.total ?? 0;
 }

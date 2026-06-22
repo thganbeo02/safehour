@@ -1,7 +1,7 @@
 # Product Requirements Document (PRD)
 
-**Version:** 1.0.0  
-**Last updated:** 2026-06-10
+**Version:** 1.0.1  
+**Last updated:** 2026-06-22
 
 > Defers upward to `00-safety-charter.md`. Where anything in this document conflicts with the Safety Charter, the Charter wins. This PRD covers the product vision, positioning, principles, and MVP scope. Architecture and the data model live in `02-technical-design.md`; build order and QA live in `04-roadmap-and-qa.md`.
 
@@ -218,8 +218,11 @@ Purpose: define barriers before the next urge. Core requirements: choose safety 
 
 Purpose: give the user a calm, honest record of money kept _out of the loop_ — money set aside from real income and money repaid toward debt — so progress is visible without ever becoming a recovery target. Core requirements:
 
-- Record a protection entry: amount, currency, and kind (`saved` or `debt_repaid`).
-- Show a single gentle cumulative figure: "money protected so far."
+- Record a protection entry: amount, currency, kind (`saved`, `debt_repaid`, or `withdrawal`), and destination. Reachability applies to `saved` and `withdrawal` entries.
+- Destinations are kind-dependent labels only: for `saved`, where money is kept; for `debt_repaid`, who/what was repaid; for `withdrawal`, where protected money was drawn from. They must not store balances, account links, balance-fetching behavior, or external financial connections.
+- Saved money held by a trusted person may count toward protected total because it creates real distance from relapse, but only with a mandatory friction gate, no frictionless reclaim/withdraw affordance, and append-only history for any reductions.
+- Trusted-person handoff may also be modeled as a SafetyCommitment, because it is both protected money and a practical relapse barrier.
+- Show a single gentle cumulative figure: "money protected so far," derived from entries rather than stored as a mutable running total.
 - Frame strictly as protection — never "recovered," "back," "regained," or "earned back."
 - Real income only. No field can hold a trading/gambling gain.
 - **No targets.** No "you need X more," no goal line, no gap a trade could close.
@@ -248,7 +251,7 @@ Optional: Urge History, Check-In History, Edit Trusted Contact, Relapse Review.
 
 Recommended order: (1) Panic Mode CTA, (2) Contact trusted person, (3) Daily check-in, (4) Recovery streak, (5) Active safety commitments, (6) Money protected, (7) Log urge, (8) Loss ledger.
 
-The recovery streak should be shown gently and low in the hierarchy — present, but never the dominant number on the screen. Money protected is likewise shown gently, as one quiet signal among several. The loss ledger sits last on purpose: reachable, not foregrounded. Money protected and the loss ledger must not be placed adjacent or visually paired — a "protected vs. lost" juxtaposition reads as a net/scoreboard and is forbidden (see `02-technical-design.md` §15).
+The recovery streak should be shown gently and low in the hierarchy — present, but never the dominant number on the screen. Money protected is likewise shown gently, as one quiet signal among several. If some protected money is held by a trusted person, the home screen may reflect it only as part of the calm cumulative protected total; it must not foreground a person-held balance, show a frictionless reclaim path, or create urgency around getting it back. The loss ledger sits last on purpose: reachable, not foregrounded. Money protected and the loss ledger must not be placed adjacent or visually paired — a "protected vs. lost" juxtaposition reads as a net/scoreboard and is forbidden (see `02-technical-design.md` §15).
 
 ## C7. MVP Design Direction
 
@@ -260,4 +263,5 @@ Should feel: calm, minimal, mobile-first, fast to use, non-judgmental, serious b
 
 | Version | Date       | Change           |
 | ------- | ---------- | ---------------- |
+| 1.0.1   | 2026-06-22 | Clarified Money Protected destinations and trusted-person handoff behavior. |
 | 1.0.0   | 2026-06-10 | Initial version. |

@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { HomePlaceholderScreen } from "@/screens/HomePlaceholderScreen";
+import { MainNavigator } from "@/screens/MainNavigator";
 import { LoadingScreen } from "@/screens/LoadingScreen";
 import { OnboardingScreen } from "@/screens/OnboardingScreen";
 import {
@@ -89,7 +89,7 @@ export function AppRoot() {
       {showOnboarding ? (
         <OnboardingScreen onEnter={handleOnboardingComplete} />
       ) : (
-        <HomePlaceholderScreen
+        <MainNavigator
           onResetOnboarding={handleDevelopmentReset}
           onWipeLocalData={handleDevelopmentWipe}
         />

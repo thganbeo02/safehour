@@ -9,6 +9,43 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ---
 
+## [2026-06-23] — Implement custom navigation and Money Protected MVP UI — v0.1.5
+
+Created a beautiful custom bottom navigation bar with 5 tabs and built the full Money Protected screen following the interactive mockup design with inline custom place additions and friction gates.
+
+### Added
+
+- Created `src/screens/MainNavigator.tsx` for custom stateful bottom tab navigation.
+- Created placeholder screens: `HomeScreen.tsx`, `ContactsScreen.tsx`, `UrgeLogScreen.tsx`, `SettingsScreen.tsx`.
+- Created `ProtectedScreen.tsx` implementing the complete money protected UI with inline interactive SVGs, underline-only inputs, list of destinations, custom place additions, and friction gates on withdrawal.
+
+### Changed
+
+- Updated `src/app/AppRoot.tsx` to render the new `MainNavigator` instead of the static placeholder.
+- Updated `src/storage/db.ts` to migrate the `protection_entries` table schema to Version 1.1.0 with kind-dependent destinations, reachability columns, signed amounts, and SQLite helper functions.
+
+## [2026-06-22] — Add protected-money destinations safety model — v0.1.4
+
+Documented the Money Protected destination model, including trusted-person held money as protected only behind a mandatory friction gate.
+
+### Added
+
+- Added `ProtectionEntry.destination`, scoped `reachability`, and `withdrawal` kind with signed amount behavior in the TDD.
+- Added trusted-person held-money mitigation to the Money Protected feature spec.
+- Added QA safety item S-14 for kind-dependent destination labels, no balance/link-out behavior, scoped reachability, signed withdrawal validation, and append-only reduction handling.
+
+### Changed
+
+- Clarified PRD Money Protected scope to include kind-dependent destinations and trusted-person handoff as both protected money and a SafetyCommitment.
+- Confirmed no Safety Charter amendment is required because the change remains within protection framing, real-income-only records, no netting, and no recovery target.
+
+| Doc | Version |
+|---|---|
+| 01-prd | 1.0.1 |
+| 02-technical-design | 1.1.0 |
+| 04-roadmap-and-qa | 1.1.0 |
+| features/money-protected | 1.1.0 |
+
 ## [2026-06-16] — Add local persistence skeleton — v0.1.3
 
 Completed the remaining M1 storage gap by adding a local-first SQLite skeleton and wiring onboarding completion to durable local state.
