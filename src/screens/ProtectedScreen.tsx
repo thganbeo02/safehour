@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Animated,
   Modal,
   Platform,
   Pressable,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import Svg, { Path, Rect, Circle } from "react-native-svg";
+import { useToast } from "react-native-toast-notifications";
 
 import { IconSvgLocal } from "@/components/icons/IconSvgLocal";
 import { colors } from "@/theme/colors";
@@ -97,6 +99,13 @@ export function ProtectedScreen() {
   const [kind, setKind] = useState<"saved" | "debt_repaid" | "withdrawal">("saved");
   const [context, setContext] = useState("");
 
+  const toast = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const [fadeAnim] = useState(() => new Animated.Value(1));
+  const [translateAnim] = useState(() => new Animated.Value(0));
+
   // Stateful selection lists based on the add_sheet design mockup
   const [places, setPlaces] = useState<PlaceOption[]>([
     { id: "bank", name: "In a bank", reachability: "self_held" },
@@ -118,6 +127,12 @@ export function ProtectedScreen() {
 
   const [isAddingLender, setIsAddingLender] = useState(false);
   const [newLenderName, setNewLenderName] = useState("");
+
+  const formatAsYouType = (text: string) => {
+    const clean = text.replace(/[^0-9]/g, "");
+    if (!clean) return "";
+    return new Intl.NumberFormat("en-US").format(parseInt(clean, 10));
+  };
 
   useEffect(() => {
     loadData();
@@ -176,49 +191,87 @@ export function ProtectedScreen() {
     // Withdrawal stores amount as negative
     const finalAmount = kind === "withdrawal" ? -numericAmount : numericAmount;
 
-    try {
-      // If it's a withdrawal from trusted person (held_by_other), trigger friction gate!
-      if (kind === "withdrawal" && finalReachability === "held_by_other") {
-        Alert.alert(
-          "Pause & Contact",
-          "This money is held by a trusted person. To protect your recovery, we encourage you to take a breath, pause for 10 minutes, and contact your accountability person before making any fast money movements.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "I have paused & wish to record this withdrawal",
-              onPress: async () => {
-                await saveProtectionEntry({
-                  amount: finalAmount,
-                  currency: "VND",
-                  kind,
-                  destination: finalDestination,
-                  reachability: finalReachability,
-                  context: context.trim() || undefined,
-                });
-                setModalVisible(false);
-                loadData();
-              },
-            },
-          ]
-        );
-        return;
-      }
-
-      await saveProtectionEntry({
-        amount: finalAmount,
-        currency: "VND",
-        kind,
-        destination: finalDestination,
-        reachability: finalReachability,
-        context: context.trim() || undefined,
-      });
-
-      setModalVisible(false);
-      loadData();
-    } catch (error) {
-      Alert.alert("Error", "Could not save protection entry.");
-      console.error(error);
+    // Define the toast message verb-first
+    let toastMsg = "";
+    if (kind === "saved") {
+      toastMsg = `Protected · ${amount} VND kept aside`;
+    } else if (kind === "debt_repaid") {
+      toastMsg = `Protected · ${amount} VND repaid`;
+    } else {
+      toastMsg = `Protected · ${amount} VND withdrawn`;
     }
+
+    const executeSave = async () => {
+      try {
+        setIsSaving(true);
+        await saveProtectionEntry({
+          amount: finalAmount,
+          currency: "VND",
+          kind,
+          destination: finalDestination,
+          reachability: finalReachability,
+          context: context.trim() || undefined,
+        });
+
+        // Swap Save button to "Saved" with check icon (hold for 700ms)
+        setIsSaving(false);
+        setIsSaved(true);
+
+        setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(fadeAnim, {
+              toValue: 0,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+            Animated.timing(translateAnim, {
+              toValue: -8,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+          ]).start(() => {
+            setModalVisible(false);
+            // Reset state
+            fadeAnim.setValue(1);
+            translateAnim.setValue(0);
+            setIsSaved(false);
+            loadData();
+
+            // Fire custom slide-in toast from bottom
+            setTimeout(() => {
+              toast.show(toastMsg, {
+                type: "protection_saved",
+                animationType: "slide-in",
+                duration: 1800,
+              });
+            }, 100);
+          });
+        }, 700);
+
+      } catch (error) {
+        setIsSaving(false);
+        Alert.alert("Error", "Could not save protection entry.");
+        console.error(error);
+      }
+    };
+
+    // If it's a withdrawal from trusted person (held_by_other), trigger friction gate!
+    if (kind === "withdrawal" && finalReachability === "held_by_other") {
+      Alert.alert(
+        "Pause & Contact",
+        "This money is held by a trusted person. To protect your recovery, we encourage you to take a breath, pause for 10 minutes, and contact your accountability person before making any fast money movements.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "I have paused & wish to record this withdrawal",
+            onPress: executeSave,
+          },
+        ]
+      );
+      return;
+    }
+
+    await executeSave();
   };
 
   const formatCurrency = (val: number) => {
@@ -357,7 +410,15 @@ export function ProtectedScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.formContainer}>
+        <Animated.View
+          style={[
+            styles.formContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: translateAnim }],
+            },
+          ]}
+        >
           {/* Header */}
           <View style={styles.formHeader}>
             <Text style={styles.formHeaderTitle}>Add protection</Text>
@@ -377,8 +438,7 @@ export function ProtectedScreen() {
                 placeholder="0"
                 placeholderTextColor={colors.gray}
                 value={amount}
-                onChangeText={(txt) => setAmount(txt.replace(/[^0-9]/g, ""))}
-                autoFocus
+                onChangeText={(txt) => setAmount(formatAsYouType(txt))}
               />
               <Text style={styles.amountCurrency}>VND</Text>
             </View>
@@ -634,12 +694,44 @@ export function ProtectedScreen() {
               onChangeText={setContext}
             />
 
-            {/* Save Button */}
-            <Pressable style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
-            </Pressable>
           </ScrollView>
-        </View>
+
+          {/* Fixed Footer */}
+          <View style={styles.formFooter}>
+            <Pressable
+              style={[
+                styles.saveButton,
+                (isNaN(parseFloat(amount.replace(/,/g, ""))) || parseFloat(amount.replace(/,/g, "")) <= 0 || isSaving || isSaved) && styles.saveButtonDisabled,
+              ]}
+              onPress={handleSave}
+              disabled={isNaN(parseFloat(amount.replace(/,/g, ""))) || parseFloat(amount.replace(/,/g, "")) <= 0 || isSaving || isSaved}
+            >
+              {isSaved ? (
+                <View style={styles.savedButtonLabelContainer}>
+                  <Svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={colors.teal}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <Path d="M20 6L9 17l-5-5" />
+                  </Svg>
+                  <Text style={[styles.saveButtonText, { color: colors.teal }]}>
+                    Saved
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.saveButtonText}>
+                  {isSaving ? "Saving..." : "Save"}
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        </Animated.View>
       </Modal>
     </View>
   );
@@ -930,7 +1022,7 @@ const styles = StyleSheet.create({
   amountLabel: {
     fontSize: 14,
     color: colors.navy,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
     marginBottom: 10,
   },
   amountInputContainer: {
@@ -956,7 +1048,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 14,
     color: colors.navy,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
     marginBottom: 10,
     marginTop: 16,
   },
@@ -988,7 +1080,7 @@ const styles = StyleSheet.create({
   },
   kindBtnTextActive: {
     color: colors.teal,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
   },
   placesBox: {
     borderWidth: 1,
@@ -1017,13 +1109,13 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.regular,
   },
   placeLabelSelected: {
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
     color: colors.teal,
   },
   addPlaceLabel: {
     fontSize: 15,
     color: colors.teal,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
   },
   addCustomRow: {
     padding: 16,
@@ -1069,11 +1161,11 @@ const styles = StyleSheet.create({
   smallToggleText: {
     fontSize: 12,
     color: colors.gray,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
   },
   smallToggleTextActive: {
     color: colors.teal,
-    fontFamily: fontFamilies.bold,
+    fontFamily: fontFamilies.regular,
   },
   addCustomActions: {
     flexDirection: "row",
@@ -1087,7 +1179,7 @@ const styles = StyleSheet.create({
   addCustomBtnCancelText: {
     fontSize: 13,
     color: colors.gray,
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.regular,
   },
   addCustomBtnConfirm: {
     backgroundColor: colors.teal,
@@ -1098,7 +1190,7 @@ const styles = StyleSheet.create({
   addCustomBtnConfirmText: {
     fontSize: 13,
     color: colors.white,
-    fontFamily: fontFamilies.bold,
+    fontFamily: fontFamilies.regular,
   },
   disclaimerCopy: {
     fontSize: 12,
@@ -1123,6 +1215,14 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: "top",
   },
+  formFooter: {
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    borderTopWidth: 0.5,
+    borderTopColor: colors.paleTeal,
+    paddingTop: 12,
+  },
   saveButton: {
     width: "100%",
     backgroundColor: colors.white,
@@ -1132,7 +1232,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 48,
+    marginBottom: 0,
     shadowColor: colors.navy,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.02,
@@ -1141,7 +1241,15 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: colors.navy,
-    fontFamily: fontFamilies.bold,
+    fontFamily: fontFamilies.regular,
     fontSize: 15,
+  },
+  savedButtonLabelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  saveButtonDisabled: {
+    opacity: 0.35,
   },
 });

@@ -11,16 +11,18 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ## [2026-06-23] — Implement custom navigation and Money Protected MVP UI — v0.1.5
 
-Created a beautiful custom bottom navigation bar with 5 tabs and built the full Money Protected screen following the interactive mockup design with inline custom place additions and friction gates.
+Created a beautiful custom bottom navigation bar with 5 tabs and built the full Money Protected screen following the interactive mockup design with inline custom place additions and friction gates. Added a high-fidelity animated save transition and global toast notification provider.
 
 ### Added
 
+- Installed dependency `react-native-toast-notifications` to support non-intrusive modal success alerts. Added custom type `protection_saved` only; built-in success (green) and danger (red) alert styles are strictly forbidden to ensure color semantics do not trigger speculative trading dashboard habits (Charter §11).
 - Created `src/screens/MainNavigator.tsx` for custom stateful bottom tab navigation.
 - Created placeholder screens: `HomeScreen.tsx`, `ContactsScreen.tsx`, `UrgeLogScreen.tsx`, `SettingsScreen.tsx`.
 - Created `ProtectedScreen.tsx` implementing the complete money protected UI with inline interactive SVGs, underline-only inputs, list of destinations, custom place additions, and friction gates on withdrawal.
 
 ### Changed
 
+- Configured `AppRoot.tsx` with global `<ToastProvider>` set to standard neutral styling, bottom placement, and slide-in animations.
 - Updated `src/app/AppRoot.tsx` to render the new `MainNavigator` instead of the static placeholder.
 - Updated `src/storage/db.ts` to migrate the `protection_entries` table schema to Version 1.1.0 with kind-dependent destinations, reachability columns, signed amounts, and SQLite helper functions.
 

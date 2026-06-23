@@ -5,7 +5,9 @@ import {
   SpaceGrotesk_700Bold,
 } from "@expo-google-fonts/space-grotesk";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { ToastProvider } from "react-native-toast-notifications";
+import Svg, { Path } from "react-native-svg";
 
 import { MainNavigator } from "@/screens/MainNavigator";
 import { LoadingScreen } from "@/screens/LoadingScreen";
@@ -85,17 +87,41 @@ export function AppRoot() {
   }
 
   return (
-    <View style={styles.root}>
-      {showOnboarding ? (
-        <OnboardingScreen onEnter={handleOnboardingComplete} />
-      ) : (
-        <MainNavigator
-          onResetOnboarding={handleDevelopmentReset}
-          onWipeLocalData={handleDevelopmentWipe}
-        />
-      )}
-      <StatusBar style="dark" />
-    </View>
+    <ToastProvider
+      placement="bottom"
+      offset={60}
+      renderType={{
+        protection_saved: (toast) => (
+          <View style={styles.toastContainer}>
+            <Svg
+              width={15}
+              height={15}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={colors.teal}
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <Path d="M20 6L9 17l-5-5" />
+            </Svg>
+            <Text style={styles.toastText}>{toast.message}</Text>
+          </View>
+        ),
+      }}
+    >
+      <View style={styles.root}>
+        {showOnboarding ? (
+          <OnboardingScreen onEnter={handleOnboardingComplete} />
+        ) : (
+          <MainNavigator
+            onResetOnboarding={handleDevelopmentReset}
+            onWipeLocalData={handleDevelopmentWipe}
+          />
+        )}
+        <StatusBar style="dark" />
+      </View>
+    </ToastProvider>
   );
 }
 
@@ -103,5 +129,27 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.offWhite,
+  },
+  toastContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    alignSelf: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.paleTeal,
+    borderRadius: 12,
+    shadowColor: colors.navy,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  toastText: {
+    fontSize: 13,
+    color: colors.navy,
+    fontFamily: "BinancePlex",
   },
 });
