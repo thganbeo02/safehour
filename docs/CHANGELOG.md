@@ -9,6 +9,30 @@ Versioning convention (see `docs/agent/doc-workflow.md` §3 for the full rule):
 
 ---
 
+## [2026-06-24] — Reorganize app by feature and refine Money Protected — v0.1.6
+
+Moved the app away from the flat screen folder toward feature-owned modules, then split Money Protected into smaller components and hooks so future safety-sensitive changes are easier to review. Preserved the Money Protected safety framing: no targets, no netting against losses, neutral total animation, and info-blue confirmation styling per Charter §11 and QA S-13/S-14.
+
+### Added
+
+- Added `src/features/` structure for screen ownership across home, onboarding, loading, contacts, urge log, settings, and protected money.
+- Added protected-money components for the total card, where-kept section, recent-history section, info modal, and add-entry sheet.
+- Added protected-money hooks for data loading/saving and the session-scoped protected total animation.
+- Added `src/lib/` formatting helpers for currency and dates.
+
+### Changed
+
+- Moved navigation to `src/app/navigation/MainNavigator.tsx`.
+- Moved onboarding runtime assets into `src/features/onboarding/assets/`.
+- Updated Money Protected main screen layout to remove the logo header, use a fixed cyan top area, and show dashboard-style where-kept and recent-history sections.
+- Changed Money Protected total animation to run only on first non-zero session entry and once after real total changes, with neutral amount color throughout.
+- Added `colors.infoBlue` for confirmation checks so saved/changed money is not styled as a trading win or loss.
+
+### Removed
+
+- Removed the obsolete flat `src/screens/` folder after moving screens into feature folders.
+- Removed the temporary `src/shared/` layer in favor of existing top-level `components`, `theme`, and `assets` folders.
+
 ## [2026-06-23] — Implement custom navigation and Money Protected MVP UI — v0.1.5
 
 Created a beautiful custom bottom navigation bar with 5 tabs and built the full Money Protected screen following the interactive mockup design with inline custom place additions and friction gates. Added a high-fidelity animated save transition and global toast notification provider.

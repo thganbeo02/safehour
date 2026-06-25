@@ -10,7 +10,7 @@ type LoadingScreenProps = {
 export function LoadingScreen({ fontsLoaded }: LoadingScreenProps) {
   return (
     <ImageBackground
-      source={require("@/assets/brand/loading-background.png")}
+        source={require("@/assets/brand/loading-background.png")}
       style={styles.background}
       resizeMode="cover"
     >

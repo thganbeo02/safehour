@@ -14,7 +14,7 @@ import {
 
 import { IconSvgLocal } from "@/components/icons/IconSvgLocal";
 import type { IconSvgName } from "@/components/icons";
-import ShieldLoveLogo from "@/assets/onboarding/shield-love.svg";
+import ShieldLoveLogo from "@/features/onboarding/assets/shield-love.svg";
 import { colors } from "@/theme/colors";
 import { fontFamilies, typography } from "@/theme/typography";
 
@@ -223,7 +223,7 @@ function IntroPage({ onStart }: { onStart: () => void }) {
   return (
     <View style={[styles.page, styles.introPage]}>
       <Image
-        source={require("@/assets/onboarding/intro.png")}
+        source={require("@/features/onboarding/assets/intro.png")}
         style={styles.introImage}
         resizeMode="contain"
       />

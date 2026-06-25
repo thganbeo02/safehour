@@ -9,9 +9,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { ToastProvider } from "react-native-toast-notifications";
 import Svg, { Path } from "react-native-svg";
 
-import { MainNavigator } from "@/screens/MainNavigator";
-import { LoadingScreen } from "@/screens/LoadingScreen";
-import { OnboardingScreen } from "@/screens/OnboardingScreen";
+import { MainNavigator } from "@/app/navigation/MainNavigator";
+import { LoadingScreen } from "@/features/loading/screens/LoadingScreen";
+import { OnboardingScreen } from "@/features/onboarding/screens/OnboardingScreen";
 import {
   completeOnboarding,
   debugReadStorage,
@@ -98,7 +98,7 @@ export function AppRoot() {
               height={15}
               viewBox="0 0 24 24"
               fill="none"
-              stroke={colors.teal}
+              stroke={colors.infoBlue}
               strokeWidth={3}
               strokeLinecap="round"
               strokeLinejoin="round"

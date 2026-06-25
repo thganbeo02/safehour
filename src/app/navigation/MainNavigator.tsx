@@ -6,11 +6,11 @@ import type { IconSvgName } from "@/components/icons";
 import { colors } from "@/theme/colors";
 import { fontFamilies } from "@/theme/typography";
 
-import { HomeScreen } from "./HomeScreen";
-import { ContactsScreen } from "./ContactsScreen";
-import { UrgeLogScreen } from "./UrgeLogScreen";
-import { ProtectedScreen } from "./ProtectedScreen";
-import { SettingsScreen } from "./SettingsScreen";
+import { HomeScreen } from "@/features/home/screens/HomeScreen";
+import { ContactsScreen } from "@/features/contacts/screens/ContactsScreen";
+import { UrgeLogScreen } from "@/features/urge-log/screens/UrgeLogScreen";
+import { ProtectedScreen } from "@/features/protected-money/screens/ProtectedScreen";
+import { SettingsScreen } from "@/features/settings/screens/SettingsScreen";
 
 type TabName = "Home" | "Contacts" | "Urge Log" | "Protected" | "Settings";
 
